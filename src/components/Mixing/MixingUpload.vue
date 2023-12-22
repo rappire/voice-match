@@ -54,7 +54,7 @@ const moveMastering = async () => {
   };
   formData.append("file", music_file.value);
 
-  axios.defaults.baseURL = "http://localhost:8000/";
+  axios.defaults.baseURL = "http://158.179.193.90:8000/";
   let result = null;
   await axios.post("/mix", formData, config).then((res) => {
     result = res.data;
@@ -63,8 +63,8 @@ const moveMastering = async () => {
   router.push({
     name: "MasteringResult",
     state: {
-      origin: `http://localhost:8000/download/music/${result.origin}`,
-      after: `http://localhost:8000/download/music/${result.after_mix}`,
+      origin: `http://158.179.193.90:8000/download/music/${result.origin}`,
+      after: `http://158.179.193.90:8000/download/music/${result.after_mix}`,
       title: fileName.value,
     },
   }); // 이동하고자 하는 내부 페이지의 경로를 설정해주세요
