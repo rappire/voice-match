@@ -31,6 +31,14 @@
         <div class="border-rotation" v-if="isDragActive" :style="{ animationPlayState: isDragActive ? 'running' : 'paused' }"></div>
       </div>
     </div>
+    <loading v-model:active="isLoading" :is-full-page="true" :height="128" :width="128" color="#fff" :enforce-focus="true">
+      <div class="row justify-content-center">
+        <span class="loader"></span>
+      </div>
+      <div class="row">
+        <h1 class="typing-text">Now Mastering</h1>
+      </div>
+    </loading>
     <button @click="moveMastering" class="upload-button" :disabled="!isFileOver">Go Mixing</button>
   </div>
 </template>
@@ -43,9 +51,13 @@ import upload from "@/assets/img/voice-match/upload.png";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
+
 const router = useRouter();
 
 const moveMastering = async () => {
+  isLoading.value = true;
   const formData = new FormData();
   const config = {
     header: {
@@ -58,6 +70,7 @@ const moveMastering = async () => {
   let result = null;
   await axios.post("/mix", formData, config).then((res) => {
     result = res.data;
+    isLoading.value = false;
   });
 
   router.push({
@@ -67,13 +80,15 @@ const moveMastering = async () => {
       after: `http://158.179.193.90:8000/download/music/${result.after_mix}`,
       title: fileName.value,
     },
-  }); // 이동하고자 하는 내부 페이지의 경로를 설정해주세요
+  });
 };
 
 const isFileOver = ref(false);
 const fileName = ref("");
 const music_file = ref(null);
-const url = ref("");
+const isLoading = ref(false);
+
+const wait = (timeToDelay) => new Promise((resolve) => setTimeout(resolve, timeToDelay));
 
 const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
   onDrop: (acceptFiles, rejectReasons) => {
@@ -226,6 +241,52 @@ const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+.loader {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  border: 10px solid;
+  box-sizing: border-box;
+  animation: animloader 1s linear infinite alternate;
+}
+@keyframes animloader {
+  0% {
+    border-color: white #055694 #055694 #055694;
+  }
+  33% {
+    border-color: white white #055694 #055694;
+  }
+  66% {
+    border-color: white white white #055694;
+  }
+  100% {
+    border-color: white white white white;
+  }
+}
+
+.typing-text {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 2s steps(40) infinite;
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blinking {
+  50% {
+    opacity: 0;
   }
 }
 </style>
